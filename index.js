@@ -5,22 +5,25 @@ const { Server } = require('socket.io');
 
 const app = express();
 
-// Load SSL certificate and private key
+// Load SSL certificate, key, and CA bundle
 const options = {
-  key: fs.readFileSync('/path/to/your_domain.key'), // Replace with your key file path
-  cert: fs.readFileSync('/path/to/your_domain.crt'), // Replace with your cert file path
-  ca: fs.readFileSync('/path/to/ca_bundle.crt'), // Optional: replace with your CA bundle file path
+  key: fs.readFileSync('./crobqs.key'), // Replace with your key file path
+  cert: fs.readFileSync('./crobqs.crt'), // Replace with your cert file path
+  // ca: fs.readFileSync('./ca_bundle.crt'), // Optional: replace with CA bundle file path if needed
 };
 
+// Create HTTPS server
 const server = https.createServer(options, app);
 const io = new Server(server);
 
-let PORT = 3000;
+// Port for HTTPS traffic (443)
+let PORT = 443;
 let clients = new Map();
 
-// Serve static files from the 'public' directory
+// Serve static files from 'public' directory
 app.use(express.static(__dirname + '/public'));
 
+// WebSocket event handling
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
@@ -45,7 +48,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Listen on HTTPS
+// Start the HTTPS server
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on https://crobqs.com:${PORT}`);
+  console.log(`Server running on https://crobqs.com`);
 });
