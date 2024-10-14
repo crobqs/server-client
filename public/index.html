@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+    #messages { list-style-type: none; padding: 0; }
+    #messages li { margin: 5px 0; }
+    #form { display: flex; }
+    #input { flex: 1; padding: 10px; }
+    #send { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Chat Room</h2>
+  <ul id="messages"></ul>
+  <form id="form" action="">
+    <input id="input" autocomplete="off" placeholder="Type your message..." /><button id="send">Send</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+      const socket = io("https://crobqs.com:3000"); // Use HTTPS
+      let username = prompt("Enter your username:") || "Anonymous";
+  
+      // Send the username to the server
+      socket.emit('join', username);
+  
+      const form = document.getElementById('form');
+      const input = document.getElementById('input');
+      const messages = document.getElementById('messages');
+  
+      // Handle new messages from the server
+      socket.on('message', (msg) => {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        messages.appendChild(li);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+  
+      // Send messages to the server
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit('chat message', input.value);
+          input.value = '';
+        }
+      });
+      // openssl req -nodes -newkey rsa:2048 -keyout crobqs.com.key -out crobqs.com.csr
+  </script>
+  
+</body>
+</html>
